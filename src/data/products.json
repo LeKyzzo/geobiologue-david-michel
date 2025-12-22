@@ -1,0 +1,50 @@
+[
+  {
+    "id": "encens-alchimique-universel",
+    "name": "Encens Alchimique universel",
+    "description": "Encens élaboré selon un procédé alchimique lunaire pour purifier les lieux et soutenir les rituels de libération.",
+    "image": "/produits/encens.png",
+    "highlights": [
+      "Poudres végétales consacrées par David",
+      "Montée progressive pour accompagner les prières",
+      "Idéal avant une harmonisation énergétique"
+    ],
+    "ritual": "Déposer une pincée sur un charbon ardent puis faire circuler la fumée dans les pièces à harmoniser."
+  },
+  {
+    "id": "sel-noir-hawai",
+    "name": "Sel noir d'Hawaï alchimique exorcisé",
+    "description": "Sel volcanique magnétisé, utilisé pour sceller les seuils et absorber les mémoires lourdes.",
+    "image": "/produits/sel-noir.png",
+    "highlights": [
+      "Rechargé sur les réseaux telluriques positifs",
+      "Action immédiate sur les points d'entrée",
+      "Convient aux habitats comme aux cabinets"
+    ],
+    "ritual": "Tracer un fin cordon devant les portes ou déposer une coupelle aux angles de la pièce durant 72 h."
+  },
+  {
+    "id": "condensateur-quatre-elements",
+    "name": "Condensateur alchimique des quatre éléments",
+    "description": "Pièce soufflée en atelier, programmée pour rééquilibrer l'eau, l'air, le feu et la terre dans un même volume.",
+    "image": "/produits/condensateur.png",
+    "highlights": [
+      "Soufflé individuellement et numéroté",
+      "Champ harmonique de 80 m²",
+      "Livré avec protocole d'activation"
+    ],
+    "ritual": "Positionner l'objet au centre du lieu, activer par respiration consciente puis laisser agir 21 jours."
+  },
+  {
+    "id": "bougie-rituel-ancestral",
+    "name": "Bougie Rituel Ancestral aux herbes alchimiques",
+    "description": "Bougie coulée à la main avec des macérats de plantes sacrées pour soutenir les rituels de passage.",
+    "image": "/produits/bougie.png",
+    "highlights": [
+      "Infusion à froid de 12 herbes alchimiques",
+      "Durée de combustion moyenne de 40 h",
+      "Coulée en phase lunaire propice"
+    ],
+    "ritual": "Allumer la bougie en conscience, formuler l'intention puis laisser brûler jusqu'à la formation d'un halo stable."
+  }
+]

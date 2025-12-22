@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f1ea;
+  --foreground: #1a1f1c;
+  --surface: #ffffff;
+  --forest: #1f3b2c;
+  --sapin: #2f5c4d;
+  --sage: #9ab9a3;
+  --mist: #eef3ef;
+  --sand: #d9cbb7;
+  --stone: #5c6b6f;
+  --accent: #3c6d64;
+  --space-section-y: clamp(3rem, 4vw, 5rem);
+  --space-section-x: clamp(1.5rem, 4vw, 3rem);
+  --space-card: clamp(1.5rem, 3vw, 2.75rem);
+  --radius-xl: 32px;
+  --header-safe: clamp(6.5rem, 14vw, 8.5rem);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-forest: var(--forest);
+  --color-sapin: var(--sapin);
+  --color-sage: var(--sage);
+  --color-mist: var(--mist);
+  --color-sand: var(--sand);
+  --color-stone: var(--stone);
+  --color-accent: var(--accent);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at top, var(--mist), var(--background));
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 0.2vw + 0.95rem, 1.05rem);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  min-height: 100vh;
+}
+
+main {
+  width: 100%;
+  padding-top: var(--header-safe);
+}
+
+.hero-flush {
+  margin-top: calc(-1 * var(--header-safe));
+}
+
+.section-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-section-y) var(--space-section-x);
+  gap: var(--space-card);
+}
+
+@media (max-width: 768px) {
+  .section-shell {
+    padding: clamp(2.5rem, 8vw, 3rem) 1.25rem;
+  }
+}
