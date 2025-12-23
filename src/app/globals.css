@@ -58,7 +58,7 @@ main {
 
 .section-shell {
   max-width: 1280px;
-  margin: 0 auto;
+  margin-inline: auto;
   padding: var(--space-section-y) var(--space-section-x);
   gap: var(--space-card);
 }

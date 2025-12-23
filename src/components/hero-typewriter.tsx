@@ -20,26 +20,29 @@ export function HeroTypewriter({
 
   useEffect(() => {
     const currentPhrase = safePhrases[index % safePhrases.length];
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     if (!isDeleting && displayed === currentPhrase) {
-      const pauseTimer = setTimeout(() => setIsDeleting(true), pauseDuration);
-      return () => clearTimeout(pauseTimer);
+      timer = setTimeout(() => setIsDeleting(true), pauseDuration);
+    } else if (isDeleting && displayed === "") {
+      timer = setTimeout(() => {
+        setIsDeleting(false);
+        setIndex((prev) => (prev + 1) % safePhrases.length);
+      }, typingSpeed);
+    } else {
+      timer = setTimeout(() => {
+        const nextValue = isDeleting
+          ? currentPhrase.slice(0, Math.max(0, displayed.length - 1))
+          : currentPhrase.slice(0, displayed.length + 1);
+        setDisplayed(nextValue);
+      }, isDeleting ? typingSpeed / 1.5 : typingSpeed);
     }
 
-    if (isDeleting && displayed === "") {
-      setIsDeleting(false);
-      setIndex((prev) => (prev + 1) % safePhrases.length);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      const nextValue = isDeleting
-        ? currentPhrase.slice(0, Math.max(0, displayed.length - 1))
-        : currentPhrase.slice(0, displayed.length + 1);
-      setDisplayed(nextValue);
-    }, isDeleting ? typingSpeed / 1.5 : typingSpeed);
-
-    return () => clearTimeout(timer);
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, [displayed, index, isDeleting, pauseDuration, safePhrases, typingSpeed]);
 
   return (

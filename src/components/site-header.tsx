@@ -34,9 +34,12 @@ export function SiteHeader() {
               <a href="tel:+33658021724" className="hover:text-[var(--sand)]">
                 06 58 02 17 24
               </a>
-              <span className="hidden border-l border-white/30 pl-3 lg:inline">
+              <a
+                href="mailto:contact@geobiologue-isere.fr"
+                className="hidden border-l border-white/30 pl-3 hover:text-[var(--sand)] lg:inline"
+              >
                 contact@geobiologue-isere.fr
-              </span>
+              </a>
             </div>
           </div>
         </div>
