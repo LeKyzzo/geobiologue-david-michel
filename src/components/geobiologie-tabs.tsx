@@ -111,12 +111,6 @@ export function GeobiologieTabs() {
               {current.title}
             </h2>
           </div>
-          <button
-            type="button"
-            className="rounded-full border border-[var(--forest)] px-6 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--forest)] transition hover:bg-[var(--forest)] hover:text-white"
-          >
-            En savoir plus
-          </button>
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">

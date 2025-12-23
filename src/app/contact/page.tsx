@@ -107,6 +107,7 @@ const contactChannels = [
 ];
 
 const quickContacts = contactChannels.slice(0, 2);
+const addressChannel = contactChannels.find((channel) => channel.label === "Adresse");
 
 export default function ContactPage() {
   return (
@@ -175,38 +176,7 @@ export default function ContactPage() {
         ))}
       </section>
 
-      <section className="section-shell grid gap-8 md:grid-cols-[0.9fr,1.1fr]">
-        <div className="space-y-5">
-          <div>
-            <p className="text-sm font-semibold text-[var(--sapin)]">Coordonnées directes</p>
-            <p className="mt-2 text-lg text-[var(--stone)]">
-              Joignable du lundi au samedi, 8h30 à 20h. Possibilité d&rsquo;intervention urgente selon le planning.
-            </p>
-          </div>
-          {contactChannels.map((channel) => (
-            <div key={channel.label} className="flex items-center gap-4 rounded-[28px] border border-[var(--mist)] p-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--sage)]/40 text-[var(--sapin)]">
-                {channel.icon}
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase text-[var(--stone)]">{channel.label}</p>
-                {channel.href ? (
-                  <Link href={channel.href} className="text-xl font-semibold text-[var(--forest)]">
-                    {channel.value}
-                  </Link>
-                ) : (
-                  <p className="text-lg text-[var(--forest)]">{channel.value}</p>
-                )}
-              </div>
-            </div>
-          ))}
-          <div className="rounded-[28px] bg-[var(--sapin)]/90 p-[var(--space-card)] text-white">
-            <p className="text-sm font-semibold text-[var(--sage)]">Zones d&rsquo;intervention</p>
-            <p className="mt-2 text-white/85">
-              Isère, Savoie, Rhône, Ain, Drôme et accompagnement à distance sur plan.
-            </p>
-          </div>
-        </div>
+      <section className="section-shell grid gap-8 md:grid-cols-[1.15fr,0.85fr]">
         <div className="space-y-6">
           <ContactForm />
           <div className="overflow-hidden rounded-[32px] border border-[var(--mist)] shadow-lg shadow-[var(--forest)]/10">
@@ -221,6 +191,28 @@ export default function ContactPage() {
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
+        </div>
+        <div>
+          <div className="rounded-[28px] bg-[var(--sapin)]/90 p-[var(--space-card)] text-white">
+            <p className="text-sm font-semibold text-[var(--sage)]">Zones d&rsquo;intervention</p>
+            <p className="mt-2 text-white/85">
+              Ain · Ardèche · Creuse · Drôme · Gard · Hautes-Alpes · Hautes-Loire · Hautes-Vienne · Indre · Isère · Loire · Puy de dôme · Rhône · Saône-et-loire · Vaucluse · Vienne
+            </p>
+          </div>
+          {addressChannel && (
+            <div className="mt-6 rounded-[28px] border border-[var(--mist)] bg-white/95 p-[var(--space-card)] text-[var(--forest)]">
+              <p className="text-sm font-semibold text-[var(--pine)]">Adresse du cabinet</p>
+              <div className="mt-3 flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--mist)]/60 text-[var(--forest)]">
+                  {addressChannel.icon}
+                </span>
+                <div>
+                  <p className="text-base font-semibold leading-snug">{addressChannel.value}</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-[var(--pine)]/70">Saint-Martin-d&rsquo;Uriage</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>

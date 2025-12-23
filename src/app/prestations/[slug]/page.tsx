@@ -130,7 +130,7 @@ export default function PrestationDetailPage({ params }: PrestationsDetailProps)
             ))}
           </ul>
           <p className="mt-6 text-[var(--stone)]">
-            Chaque expertise se déroule sur place, complétée si besoin d'une
+            Chaque prestation se déroule sur place, complétée si besoin d'une
             analyse à distance à partir des plans et relevés photographiques. Les
             mesures sont doublées pour garantir leur fiabilité.
           </p>

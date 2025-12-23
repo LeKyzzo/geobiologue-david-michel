@@ -3,7 +3,7 @@ import { Prestation } from "@/types/prestation";
 export const prestations: Prestation[] = [
   {
     slug: "expertise-habitation",
-    title: "Expertise d'habitation",
+    title: "Harmonisation d'habitation",
     audience: "Maisons, appartements, fermes et habitats collectifs",
     excerpt:
       "Identifier les perturbations géopathogènes, réseaux Hartmann/Curry et pollutions électromagnétiques qui fragilisent le sommeil et la vitalité des occupants.",
@@ -18,11 +18,11 @@ export const prestations: Prestation[] = [
       "Suivi à distance pendant 30 jours",
     ],
     duration: "Intervention de 3 à 5 heures selon la surface",
-    cta: "Demander une expertise habitation",
+    cta: "Planifier cette prestation habitation",
   },
   {
     slug: "expertise-terrain",
-    title: "Expertise de terrain",
+    title: "Diagnostic énergétique de terrain",
     audience: "Terrains à bâtir, exploitations agricoles, jardins thérapeutiques",
     excerpt:
       "Sécuriser un terrain avant construction ou plantation en détectant failles, circulations d'eau souterraines et croisements d'ondes perturbateurs.",
@@ -37,11 +37,11 @@ export const prestations: Prestation[] = [
       "Compte-rendu oral sur site",
     ],
     duration: "1 journée terrain + restitution",
-    cta: "Sécuriser mon terrain",
+    cta: "Préparer mon terrain",
   },
   {
     slug: "expertise-professionnelle",
-    title: "Expertise professionnelle",
+    title: "Accompagnement des espaces professionnels",
     audience: "Bureaux, cabinets de soin, hôtels, commerces et lieux publics",
     excerpt:
       "Créer des espaces de travail alignés et performants en maîtrisant les nuisances invisibles qui agissent sur la santé des équipes et la qualité d'accueil.",
@@ -56,6 +56,6 @@ export const prestations: Prestation[] = [
       "Sessions de ré-harmonisation programmées",
     ],
     duration: "De 1 à 3 jours selon le site",
-    cta: "Parler de mon projet pro",
+    cta: "Optimiser mon espace pro",
   },
 ];
