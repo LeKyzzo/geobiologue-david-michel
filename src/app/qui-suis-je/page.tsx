@@ -57,6 +57,7 @@ export default function AboutPage() {
         avatarAlt="Portrait de David Michel"
         avatarCaption="David Michel"
         avatarTagline="Spécialiste en soins énergétiques et géobiologie"
+          size="compact"
       />
 
       <section className="section-shell grid gap-4 text-white/90 sm:grid-cols-2 lg:grid-cols-3">

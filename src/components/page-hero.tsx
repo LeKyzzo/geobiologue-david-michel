@@ -12,6 +12,7 @@ interface PageHeroProps {
   avatarAlt?: string;
   avatarCaption?: string;
   avatarTagline?: string;
+  size?: "default" | "compact";
 }
 
 export function PageHero({
@@ -25,8 +26,17 @@ export function PageHero({
   avatarAlt,
   avatarCaption,
   avatarTagline,
-}: PageHeroProps) {
+    size = "default",
+  }: PageHeroProps) {
   const hasAvatar = Boolean(avatarUrl);
+    const titleClass =
+      size === "compact"
+        ? "mt-3 max-w-3xl text-balance text-[clamp(1.7rem,3vw,2.8rem)] font-semibold leading-tight"
+        : "mt-3 max-w-3xl text-balance text-[clamp(2.1rem,3.4vw,3.2rem)] font-semibold leading-tight";
+    const descriptionClass =
+      size === "compact"
+        ? "mt-3 max-w-2xl text-sm text-white/85 md:text-lg"
+        : "mt-3 max-w-2xl text-base text-white/85 md:text-lg";
 
   return (
     <section className="hero-flush relative flex min-h-[100vh] items-center overflow-hidden">
@@ -52,11 +62,11 @@ export function PageHero({
             <p className="text-xs uppercase text-white/80">
               {kicker ?? "Géobiologie"}
             </p>
-            <h1 className="mt-3 max-w-3xl text-balance text-[clamp(2.1rem,3.4vw,3.2rem)] font-semibold leading-tight">
+              <h1 className={titleClass}>
               {title}
             </h1>
             {description && (
-              <p className="mt-3 max-w-2xl text-base text-white/85 md:text-lg">{description}</p>
+                <p className={descriptionClass}>{description}</p>
             )}
             <div
               className={`mt-6 flex flex-wrap items-center gap-4 text-xs font-semibold uppercase ${
