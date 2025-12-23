@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 interface SubTab {
   id: string;
@@ -22,36 +22,53 @@ type SoinsSubTab =
   | "kinesiologie"
   | "electrosensible";
 
-const mainTabs: { id: MainTab; label: string; description: string; image?: { src: string; alt: string; caption: string } }[] = [
+const galleryImages = {
+  soins: ["/soins/1.png", "/soins/2.png", "/soins/3.png", "/soins/4.png", "/soins/5.png", "/soins/6.png"],
+  menhir: [
+    "/menhir/1.png",
+    "/menhir/2.png",
+    "/menhir/3.png",
+    "/menhir/4.png",
+    "/menhir/5.png",
+    "/menhir/6.png",
+  ],
+  sourcier: [
+    "/sourcier/1.png",
+    "/sourcier/2.png",
+    "/sourcier/3.png",
+    "/sourcier/4.png",
+    "/sourcier/5.png",
+    "/sourcier/6.png",
+  ],
+} as const;
+
+type GalleryKey = keyof typeof galleryImages;
+
+const getGalleryPortion = (key: GalleryKey, part: "primary" | "secondary") => {
+  const images = galleryImages[key];
+  const splitIndex = Math.ceil(images.length / 2);
+  const subset = part === "primary" ? images.slice(0, splitIndex) : images.slice(splitIndex);
+  return subset.length > 0 ? subset : images;
+};
+
+const mainTabs: { id: MainTab; label: string; description: string; galleryKey?: GalleryKey }[] = [
   {
     id: "soins",
     label: "Soins",
     description: "Approche globale pour rééquilibrer l'énergie vitale, libérer les blocages et protéger durablement votre aura.",
-    image: {
-      src: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
-      alt: "Séance de soin énergétique",
-      caption: "Soin énergétique dans le zome dédié",
-    },
+    galleryKey: "soins",
   },
   {
     id: "menhir",
     label: "Menhir",
     description: "Géo-poncture : poser des pierres levées pour harmoniser les terrains, protéger les habitats et dynamiser les cultures.",
-    image: {
-      src: "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80",
-      alt: "Menhir posé dans un champ",
-      caption: "Géo-poncture sur terrain",
-    },
+    galleryKey: "menhir",
   },
   {
     id: "sourcier",
     label: "Sourcier",
     description: "Accompagnement complet pour trouver l'eau, dimensionner un puits et sécuriser votre ressource hydrique.",
-    image: {
-      src: "https://images.unsplash.com/photo-1482192505345-5655af888cc4?auto=format&fit=crop&w=1200&q=80",
-      alt: "Recherche d'eau sur terrain",
-      caption: "Diagnostic sourcier sur site",
-    },
+    galleryKey: "sourcier",
   },
   {
     id: "stages",
@@ -75,95 +92,33 @@ const stageSubTabs: SubTab[] = [
   { id: "stage-protections", label: "Stage protections" },
 ];
 
-const soinsVisuals: Record<SoinsSubTab, { src: string; alt: string; caption: string }> = {
-  "therapie-energetique": {
-    src: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=80",
-    alt: "Soin énergétique avec cristaux",
-    caption: "Rééquilibrage énergétique",
-  },
-  degagement: {
-    src: "https://images.unsplash.com/photo-1506125859087-8427bf5030ed?auto=format&fit=crop&w=900&q=80",
-    alt: "Purification par la fumée",
-    caption: "Libération des charges",
-  },
-  transgenerationnel: {
-    src: "https://images.unsplash.com/photo-1498075702571-ecb018f3752d?auto=format&fit=crop&w=900&q=80",
-    alt: "Arbre généalogique illustré",
-    caption: "Lecture de l'arbre familial",
-  },
-  psychanalyse: {
-    src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80",
-    alt: "Carnet et fauteuil de thérapie",
-    caption: "Espace d'écoute",
-  },
-  kinesiologie: {
-    src: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
-    alt: "Test musculaire de kinésiologie",
-    caption: "Lecture du corps",
-  },
-  electrosensible: {
-    src: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=80",
-    alt: "Pose de film protecteur",
-    caption: "Blindage EMI/RF",
-  },
-};
-
-const stageVisuals: Record<StageSubTab, { src: string; alt: string; caption: string }> = {
-  "stage-sourcier": {
-    src: "https://images.unsplash.com/photo-1513863323963-1cc3c5c687af?auto=format&fit=crop&w=900&q=80",
-    alt: "Détection d'eau avec baguettes",
-    caption: "Immersion terrain",
-  },
-  "stage-geobiologie": {
-    src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
-    alt: "Paysage étudié en géobiologie",
-    caption: "Lecture des réseaux",
-  },
-  "stage-protections": {
-    src: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=900&q=80",
-    alt: "Cristaux et symboles de protection",
-    caption: "Protocoles vibratoires",
-  },
-};
-
-const menhirVisual = {
-  src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-  alt: "Menhir installé sur terrain",
-  caption: "Géo-poncture active",
-};
-
-const sourcierVisual = {
-  src: "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80",
-  alt: "Analyse de terrain pour puits",
-  caption: "Repérage des veines d'eau",
-};
 
 const sectionClass = "space-y-3 rounded-3xl border border-[var(--mist)]/80 bg-white/90 p-6";
 
 const listClass = "list-disc pl-5 text-sm text-[var(--stone)]";
 
+const PhotoGrid = ({ images, label }: { images: readonly string[]; label: string }) => (
+  <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+    {images.map((src, index) => (
+      <figure key={src} className="relative h-32 overflow-hidden rounded-2xl md:h-40">
+        <Image
+          src={src}
+          alt={`${label} ${index + 1}`}
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 220px, 45vw"
+        />
+      </figure>
+    ))}
+  </div>
+);
+
 const renderSoinsContent = (tab: SoinsSubTab) => {
-  const visual = soinsVisuals[tab];
   switch (tab) {
     case "therapie-energetique":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-                priority={tab === "therapie-energetique"}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Soins énergétiques professionnels
@@ -209,21 +164,7 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "degagement":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Soin de dégagement
@@ -262,21 +203,7 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "transgenerationnel":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Analyse transgénérationnelle
@@ -315,21 +242,7 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "psychanalyse":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Psychanalyse
@@ -360,21 +273,7 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "kinesiologie":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Kinésiologie
@@ -413,21 +312,7 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "electrosensible":
       return (
         <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Protection électrosensible
@@ -471,26 +356,10 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
 };
 
 const renderStagesContent = (tab: StageSubTab) => {
-  const visual = stageVisuals[tab];
   switch (tab) {
-    case "stage-sourcier":
-      return (
-        <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+      case "stage-sourcier":
+        return (
+          <div className="space-y-8">
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Stage initiatique sourcier
@@ -520,24 +389,9 @@ const renderStagesContent = (tab: StageSubTab) => {
           </div>
         </div>
       );
-    case "stage-geobiologie":
-      return (
-        <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+      case "stage-geobiologie":
+        return (
+          <div className="space-y-8">
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Stage avancé géobiologie
@@ -565,24 +419,9 @@ const renderStagesContent = (tab: StageSubTab) => {
           </div>
         </div>
       );
-    case "stage-protections":
-      return (
-        <div className="space-y-8">
-          {visual && (
-            <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-              <Image
-                src={visual.src}
-                alt={visual.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 520px, 100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {visual.caption}
-              </figcaption>
-            </figure>
-          )}
+      case "stage-protections":
+        return (
+          <div className="space-y-8">
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Stage protection énergétique
@@ -619,19 +458,7 @@ const renderStagesContent = (tab: StageSubTab) => {
 
 const menhirContent = (
   <div className="space-y-8">
-    <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-      <Image
-        src={menhirVisual.src}
-        alt={menhirVisual.alt}
-        fill
-        className="object-cover"
-        sizes="(min-width: 1024px) 520px, 100vw"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-        {menhirVisual.caption}
-      </figcaption>
-    </figure>
+    <PhotoGrid images={getGalleryPortion("menhir", "primary")} label="Galerie menhir" />
     <div className={sectionClass}>
       <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
         Pose de menhir et pierres levées
@@ -664,19 +491,7 @@ const menhirContent = (
 
 const sourcierContent = (
   <div className="space-y-8">
-    <figure className="relative h-48 w-full overflow-hidden rounded-[32px]">
-      <Image
-        src={sourcierVisual.src}
-        alt={sourcierVisual.alt}
-        fill
-        className="object-cover"
-        sizes="(min-width: 1024px) 520px, 100vw"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      <figcaption className="absolute inset-x-5 bottom-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-        {sourcierVisual.caption}
-      </figcaption>
-    </figure>
+    <PhotoGrid images={getGalleryPortion("sourcier", "primary")} label="Galerie sourcier" />
     <div className={sectionClass}>
       <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
         Mise en place de puits
@@ -711,14 +526,6 @@ export function PrestationsTabs() {
   const [activeTab, setActiveTab] = useState<MainTab>("soins");
   const [activeSoinsTab, setActiveSoinsTab] = useState<SoinsSubTab>("therapie-energetique");
   const [activeStageTab, setActiveStageTab] = useState<StageSubTab>("stage-sourcier");
-  const soinsScrollRef = useRef<HTMLDivElement>(null);
-  const stagesScrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollTabs = (target: HTMLDivElement | null, direction: "left" | "right") => {
-    if (!target) return;
-    const offset = direction === "left" ? -220 : 220;
-    target.scrollBy({ left: offset, behavior: "smooth" });
-  };
 
   const currentMain = mainTabs.find((tab) => tab.id === activeTab);
 
@@ -746,79 +553,57 @@ export function PrestationsTabs() {
         )}
 
         {activeTab === "soins" && (
-          <div className="relative mt-6">
-            <button
-              type="button"
-              aria-label="Voir les soins précédents"
-              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
-              onClick={() => scrollTabs(soinsScrollRef.current, "left")}
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              aria-label="Voir les soins suivants"
-              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
-              onClick={() => scrollTabs(soinsScrollRef.current, "right")}
-            >
-              &gt;
-            </button>
-            <div ref={soinsScrollRef} className="overflow-x-auto pb-2 pl-10 pr-10">
-              <div className="flex min-w-full flex-nowrap gap-3">
-                {soinsSubTabs.map((tab) => (
+          <div className="mt-6 overflow-x-auto">
+            <div className="flex w-max flex-nowrap gap-3">
+              {soinsSubTabs.map((tab) => {
+                const isActive = activeSoinsTab === tab.id;
+                return (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveSoinsTab(tab.id as SoinsSubTab)}
-                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      activeSoinsTab === tab.id
-                        ? "bg-[var(--forest)] text-white"
-                        : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
+                    aria-pressed={isActive}
+                    className={`flex min-w-[170px] flex-col rounded-2xl border px-4 py-3 text-left transition ${
+                      isActive
+                        ? "border-[var(--forest)] bg-[var(--forest)]/5 text-[var(--forest)] shadow-[0_15px_35px_rgba(31,59,44,0.18)]"
+                        : "border-transparent bg-[var(--mist)]/60 text-[var(--stone)] hover:border-[var(--sapin)]/40"
                     }`}
                   >
-                    {tab.label}
+                    <span className={`text-sm font-semibold ${isActive ? "text-[var(--forest)]" : "text-[var(--forest)]/80"}`}>
+                      {tab.label}
+                    </span>
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--stone)]/90">Soins</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
         )}
 
         {activeTab === "stages" && (
-          <div className="relative mt-6">
-            <button
-              type="button"
-              aria-label="Voir les stages précédents"
-              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
-              onClick={() => scrollTabs(stagesScrollRef.current, "left")}
-            >
-              &lt;
-            </button>
-            <button
-              type="button"
-              aria-label="Voir les stages suivants"
-              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
-              onClick={() => scrollTabs(stagesScrollRef.current, "right")}
-            >
-              &gt;
-            </button>
-            <div ref={stagesScrollRef} className="overflow-x-auto pb-2 pl-10 pr-10">
-              <div className="flex min-w-full flex-nowrap gap-3">
-                {stageSubTabs.map((tab) => (
+          <div className="mt-6 overflow-x-auto">
+            <div className="flex w-max flex-nowrap gap-3">
+              {stageSubTabs.map((tab) => {
+                const isActive = activeStageTab === tab.id;
+                return (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveStageTab(tab.id as StageSubTab)}
-                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      activeStageTab === tab.id
-                        ? "bg-[var(--forest)] text-white"
-                        : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
+                    aria-pressed={isActive}
+                    className={`flex min-w-[170px] flex-col rounded-2xl border px-4 py-3 text-left transition ${
+                      isActive
+                        ? "border-[var(--forest)] bg-[var(--forest)]/5 text-[var(--forest)] shadow-[0_15px_35px_rgba(31,59,44,0.18)]"
+                        : "border-transparent bg-[var(--mist)]/60 text-[var(--stone)] hover:border-[var(--sapin)]/40"
                     }`}
                   >
-                    {tab.label}
+                    <span className={`text-sm font-semibold ${isActive ? "text-[var(--forest)]" : "text-[var(--forest)]/80"}`}>
+                      {tab.label}
+                    </span>
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--stone)]/90">Stages</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -846,21 +631,11 @@ export function PrestationsTabs() {
             </div>
           </div>
 
-          {currentMain?.image && (
-            <figure className="relative min-h-[320px] overflow-hidden rounded-[32px]">
-              <Image
-                src={currentMain.image.src}
-                alt={currentMain.image.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 480px, 100vw"
-                priority={activeTab === "soins"}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60" />
-              <figcaption className="absolute inset-x-6 bottom-6 text-[11px] font-semibold uppercase tracking-[0.4em] text-white/80">
-                {currentMain.image.caption}
-              </figcaption>
-            </figure>
+          {currentMain?.galleryKey && (
+            <PhotoGrid
+              images={getGalleryPortion(currentMain.galleryKey, "secondary")}
+              label={`Galerie ${currentMain.label.toLowerCase()}`}
+            />
           )}
         </div>
       </div>
