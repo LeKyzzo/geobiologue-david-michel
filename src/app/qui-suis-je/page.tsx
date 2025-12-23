@@ -53,6 +53,7 @@ export default function AboutPage() {
         description="Découvrez le parcours unique de David Michel, spécialiste en soins énergétiques et géobiologie, engagé à enrichir votre parcours de vie."
         imageUrl="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1800&q=80"
         accent="Cheminement guidé par l'énergie"
+        accentVisibility="desktop"
         avatarUrl="/davidmichel.png"
         avatarAlt="Portrait de David Michel"
         avatarCaption="David Michel"
