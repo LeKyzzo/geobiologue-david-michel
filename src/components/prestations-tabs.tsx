@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface SubTab {
   id: string;
@@ -711,6 +711,14 @@ export function PrestationsTabs() {
   const [activeTab, setActiveTab] = useState<MainTab>("soins");
   const [activeSoinsTab, setActiveSoinsTab] = useState<SoinsSubTab>("therapie-energetique");
   const [activeStageTab, setActiveStageTab] = useState<StageSubTab>("stage-sourcier");
+  const soinsScrollRef = useRef<HTMLDivElement>(null);
+  const stagesScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollTabs = (target: HTMLDivElement | null, direction: "left" | "right") => {
+    if (!target) return;
+    const offset = direction === "left" ? -220 : 220;
+    target.scrollBy({ left: offset, behavior: "smooth" });
+  };
 
   const currentMain = mainTabs.find((tab) => tab.id === activeTab);
 
@@ -739,20 +747,24 @@ export function PrestationsTabs() {
 
         {activeTab === "soins" && (
           <div className="relative mt-6">
-            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 items-center justify-end bg-gradient-to-l from-white to-transparent pr-2 text-[var(--sapin)] md:flex">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              >
-                <path d="M5 12h14" strokeLinecap="round" />
-                <path d="M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div className="overflow-x-auto pb-2 pr-8">
-              <div className="flex min-w-full gap-3">
+            <button
+              type="button"
+              aria-label="Voir les soins précédents"
+              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+              onClick={() => scrollTabs(soinsScrollRef.current, "left")}
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              aria-label="Voir les soins suivants"
+              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+              onClick={() => scrollTabs(soinsScrollRef.current, "right")}
+            >
+              &gt;
+            </button>
+            <div ref={soinsScrollRef} className="overflow-x-auto pb-2 pl-10 pr-10">
+              <div className="flex min-w-full flex-nowrap gap-3">
                 {soinsSubTabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -774,20 +786,24 @@ export function PrestationsTabs() {
 
         {activeTab === "stages" && (
           <div className="relative mt-6">
-            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 items-center justify-end bg-gradient-to-l from-white to-transparent pr-2 text-[var(--sapin)] md:flex">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              >
-                <path d="M5 12h14" strokeLinecap="round" />
-                <path d="M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div className="overflow-x-auto pb-2 pr-8">
-              <div className="flex min-w-full gap-3">
+            <button
+              type="button"
+              aria-label="Voir les stages précédents"
+              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+              onClick={() => scrollTabs(stagesScrollRef.current, "left")}
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              aria-label="Voir les stages suivants"
+              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+              onClick={() => scrollTabs(stagesScrollRef.current, "right")}
+            >
+              &gt;
+            </button>
+            <div ref={stagesScrollRef} className="overflow-x-auto pb-2 pl-10 pr-10">
+              <div className="flex min-w-full flex-nowrap gap-3">
                 {stageSubTabs.map((tab) => (
                   <button
                     key={tab.id}

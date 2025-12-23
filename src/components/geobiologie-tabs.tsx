@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const tabs = [
   {
@@ -98,6 +98,14 @@ const tabs = [
 export function GeobiologieTabs() {
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
   const current = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
+  const tabScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollTabs = (direction: "left" | "right") => {
+    const container = tabScrollRef.current;
+    if (!container) return;
+    const offset = direction === "left" ? -220 : 220;
+    container.scrollBy({ left: offset, behavior: "smooth" });
+  };
 
   return (
     <section className="section-shell">
@@ -113,21 +121,41 @@ export function GeobiologieTabs() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.35em] transition ${
-                tab.id === activeTab
-                  ? "bg-[var(--forest)] text-white"
-                  : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--forest)]/10"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="relative mt-8">
+          <button
+            type="button"
+            aria-label="Voir les onglets précédents"
+            className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+            onClick={() => scrollTabs("left")}
+          >
+            &lt;
+          </button>
+          <button
+            type="button"
+            aria-label="Voir les onglets suivants"
+            className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-2 text-lg font-semibold text-[var(--forest)] shadow-lg shadow-[var(--forest)]/15"
+            onClick={() => scrollTabs("right")}
+          >
+            &gt;
+          </button>
+          <div ref={tabScrollRef} className="overflow-x-auto pb-2 pl-10 pr-10">
+            <div className="flex min-w-full flex-nowrap gap-3">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`whitespace-nowrap rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.35em] transition ${
+                    tab.id === activeTab
+                      ? "bg-[var(--forest)] text-white"
+                      : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--forest)]/10"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">

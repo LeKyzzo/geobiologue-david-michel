@@ -75,50 +75,6 @@ const heroHighlights = [
   },
 ];
 
-const supportStats = [
-  {
-    title: "Approche holistique",
-    text: "Investigation conjointe des perturbations géopathogènes, mémoires du lieu et influences électromagnétiques.",
-  },
-  {
-    title: "Suivi personnalisé",
-    text: "Compte-rendu détaillé, plan d'implantation et accompagnement pendant 30 jours après l'intervention.",
-  },
-  {
-    title: "Charte FFG",
-    text: "Pratique conforme à la charte de la Fédération Française de Géobiologie pour garantir objectivité et probité.",
-  },
-];
-
-const addressInfo = {
-  label: "Adresse du cabinet",
-  value: "125 chemin du Moulin",
-  city: "38410 Saint-Martin-d'Uriage",
-};
-
-const contactQuickLinks = [
-  {
-    label: "Téléphone",
-    value: "06 58 02 17 24",
-    href: "tel:+33658021724",
-  },
-  {
-    label: "Email",
-    value: "contact@geobiologue-isere.fr",
-    href: "mailto:contact@geobiologue-isere.fr",
-  },
-];
-
-const testimonialStats = [
-  {
-    value: "250+",
-    label: "Interventions habitat et terrain",
-  },
-  {
-    value: "80",
-    label: "Espaces professionnels réalignés",
-  },
-];
 
 export default function Home() {
   return (
@@ -181,134 +137,32 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="section-shell grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
-        <div className="text-center lg:text-left">
-          <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">Approche globale</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--forest)] md:text-4xl">
-            Une pratique qui relie géobiologie, soins énergétiques et mémoire des lieux.
-          </h2>
-          <p className="mt-4 text-lg text-[var(--stone)]">
-            Chaque mission s'appuie sur mon parcours d'énergéticien, les relevés techniques et la lecture sensible de l'histoire du lieu. L'objectif : rendre votre habitat soutenant sur la durée.
-          </p>
-          <div className="mt-6 space-y-4">
-            {supportStats.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-[24px] border border-[var(--mist)] bg-white/90 p-5 shadow-[0_20px_40px_rgba(31,59,44,0.08)]"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--sage)]/50 text-[var(--sapin)]">
-                    <svg
-                      className="h-5 w-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                    >
-                      <path d="M5 12l4 4 10-9" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--sapin)]">{item.title}</p>
-                    <p className="mt-2 text-[var(--stone)]">{item.text}</p>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-[32px] bg-[var(--forest)]/90 p-[var(--space-card)] text-white shadow-[0_30px_70px_rgba(5,24,16,0.35)]">
-          <p className="text-sm font-semibold text-white/70">Cabinet & accompagnement</p>
-          <p className="mt-3 text-lg text-white/85">
-            Les harmonisations sont réalisées depuis mon zome énergétique à Saint-Martin-d'Uriage ou directement sur votre site. Chaque dossier comprend un suivi et des recommandations concrètes.
-          </p>
-          <div className="mt-6 space-y-4">
-            {contactQuickLinks.map((contact) => (
-              <div key={contact.label} className="rounded-2xl bg-white/10 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">{contact.label}</p>
-                <Link href={contact.href} className="text-lg font-semibold text-white">
-                  {contact.value}
-                </Link>
-              </div>
-            ))}
-          </div>
+      <section className="section-shell text-center">
+        <h2 className="text-3xl font-semibold text-[var(--forest)] md:text-4xl">
+          Prestations de géobiologie
+        </h2>
+        <div className="mt-6">
           <Link
-            href="/contact"
-            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--forest)]"
+            href="/prestations"
+            className="inline-flex rounded-full bg-[var(--forest)] px-8 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white"
           >
-            Planifier un échange
+            Voir les prestations
           </Link>
         </div>
       </section>
 
       <GeobiologieTabs />
 
-      <section className="section-shell text-center">
-        <div className="rounded-[40px] border border-[var(--mist)] bg-white/90 p-[clamp(2rem,4vw,3rem)] shadow-[0_25px_60px_rgba(31,59,44,0.08)]">
-          <h2 className="text-3xl font-semibold text-[var(--forest)] md:text-4xl">
-            Retrouvez toutes les prestations détaillées du cabinet
-          </h2>
-          <Link
-            href="/prestations"
-            className="mt-6 inline-flex rounded-full bg-[var(--forest)] px-8 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white"
-          >
-            Accéder aux prestations
-          </Link>
-        </div>
-      </section>
-
       <section className="section-shell">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">
-            Avis Google vérifiés
-          </p>
+        <div className="rounded-[36px] border border-[var(--mist)] bg-white/90 p-[var(--space-card)] shadow-[0_30px_70px_rgba(5,24,16,0.08)]">
+          <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">Zones d'intervention</p>
           <h2 className="mt-3 text-3xl font-semibold text-[var(--forest)] md:text-4xl">
-            Les retours clients sont consultables directement sur Google.
+            Basé à Saint-Martin-d'Uriage, mobile en Isère, Rhône-Alpes et missions à distance.
           </h2>
           <p className="mt-4 text-lg text-[var(--stone)]">
-            Chaque intervention est suivie d&apos;un compte-rendu précis. Les avis visibles ci-contre proviennent de ma fiche Google Business et sont mis à jour automatiquement par Google.
+            Les expertises peuvent être réalisées sur site ou à distance à partir de plans précis. Les départements ci-dessous représentent mes déplacements réguliers.
           </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {testimonialStats.map((stat) => (
-              <div key={stat.label} className="rounded-[28px] border border-[var(--mist)]/80 bg-white/90 p-6">
-                <p className="text-4xl font-semibold text-[var(--forest)]">{stat.value}</p>
-                <p className="mt-2 text-sm uppercase tracking-[0.4em] text-[var(--stone)]">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6">
-            <a
-              href="https://www.google.com/maps?q=David+Michel+G%C3%A9obiologue"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--forest)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--forest)]"
-            >
-              Ouvrir la fiche sur Google
-              <svg
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              >
-                <path d="M5 12h14" strokeLinecap="round" />
-                <path d="M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-shell grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
-        <div className="rounded-[36px] border border-[var(--mist)] bg-white/90 p-[var(--space-card)]">
-          <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">Implantation</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--forest)]">
-            Basé à Saint-Martin-d'Uriage, je me déplace dans toute l'Isère, la région Rhône-Alpes et au-delà selon les besoins.
-          </h2>
-          <p className="mt-4 text-[var(--stone)]">
-            Les diagnostics peuvent être réalisés sur site ou à distance lorsque les plans et relevés sont disponibles. Votre dossier reste suivi depuis le cabinet en zome énergétique.
-          </p>
-          <div className="mt-6 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 lg:grid-cols-5">
             {zones.map((zone) => (
               <div
                 key={zone}
@@ -318,29 +172,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-        <div className="space-y-6">
-          <article className="rounded-[32px] border border-[var(--mist)] bg-white p-[var(--space-card)] shadow-[0_25px_60px_rgba(31,59,44,0.08)]">
-            <p className="text-sm font-semibold text-[var(--sapin)]">{addressInfo.label}</p>
-            <p className="mt-2 text-2xl font-semibold text-[var(--forest)]">{addressInfo.value}</p>
-            <p className="text-sm uppercase tracking-[0.4em] text-[var(--stone)]">{addressInfo.city}</p>
-            <p className="mt-4 text-sm text-[var(--stone)]">
-              Cabinet privé installé dans un zome énergétique, propice aux séances de soin et aux restitutions.
-            </p>
-          </article>
-          <article className="rounded-[32px] bg-[var(--sapin)]/90 p-[var(--space-card)] text-white">
-            <p className="text-sm font-semibold text-white/70">Un besoin prioritaire ?</p>
-            <h3 className="mt-3 text-2xl font-semibold">Créneaux sous 7 jours en Isère.</h3>
-            <p className="mt-4 text-white/85">
-              Faites-moi part des symptômes observés, des pièces concernées ou des urgences agricoles : je sécurise un passage rapide.
-            </p>
-            <Link
-              href="tel:+33658021724"
-              className="mt-6 inline-flex rounded-full bg-white/10 px-6 py-3 text-xs font-semibold uppercase tracking-[0.4em]"
-            >
-              Appeler le 06 58 02 17 24
-            </Link>
-          </article>
         </div>
       </section>
 
