@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroTypewriter } from "@/components/hero-typewriter";
 import { GeobiologieTabs } from "@/components/geobiologie-tabs";
-import { prestations } from "@/data/prestations";
 
 
 const zones = [
@@ -75,8 +74,6 @@ const heroHighlights = [
     ),
   },
 ];
-
-const featuredPrestations = prestations.slice(0, 3);
 
 const supportStats = [
   {
@@ -185,7 +182,7 @@ export default function Home() {
         </div>
       </section>
       <section className="section-shell grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
-        <div>
+        <div className="text-center lg:text-left">
           <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">Approche globale</p>
           <h2 className="mt-3 text-3xl font-semibold text-[var(--forest)] md:text-4xl">
             Une pratique qui relie géobiologie, soins énergétiques et mémoire des lieux.
@@ -199,8 +196,23 @@ export default function Home() {
                 key={item.title}
                 className="rounded-[24px] border border-[var(--mist)] bg-white/90 p-5 shadow-[0_20px_40px_rgba(31,59,44,0.08)]"
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--sapin)]">{item.title}</p>
-                <p className="mt-2 text-[var(--stone)]">{item.text}</p>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--sage)]/50 text-[var(--sapin)]">
+                    <svg
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                    >
+                      <path d="M5 12l4 4 10-9" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--sapin)]">{item.title}</p>
+                    <p className="mt-2 text-[var(--stone)]">{item.text}</p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
@@ -229,65 +241,23 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section-shell">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">Prestations phares</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--forest)] md:text-4xl">
-              Consultez la page Prestations pour découvrir chaque accompagnement en détail.
-            </h2>
-            <p className="mt-3 text-[var(--stone)]">
-              Habitats, terrains agricoles, entreprises : retrouvez la méthodologie complète, les livrables et les délais sur la page dédiée.
-            </p>
-          </div>
+      <GeobiologieTabs />
+
+      <section className="section-shell text-center">
+        <div className="rounded-[40px] border border-[var(--mist)] bg-white/90 p-[clamp(2rem,4vw,3rem)] shadow-[0_25px_60px_rgba(31,59,44,0.08)]">
+          <h2 className="text-3xl font-semibold text-[var(--forest)] md:text-4xl">
+            Retrouvez toutes les prestations détaillées du cabinet
+          </h2>
           <Link
             href="/prestations"
-            className="rounded-full border border-[var(--forest)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--forest)]"
+            className="mt-6 inline-flex rounded-full bg-[var(--forest)] px-8 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white"
           >
-            Découvrir toutes les offres
+            Accéder aux prestations
           </Link>
-        </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {featuredPrestations.map((service) => (
-            <article
-              key={service.slug}
-              className="flex h-full flex-col rounded-[32px] border border-[var(--mist)] bg-white/95 p-[var(--space-card)] shadow-[0_25px_60px_rgba(31,59,44,0.08)]"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[var(--sapin)]">{service.audience}</p>
-              <h3 className="mt-3 text-2xl font-semibold text-[var(--forest)]">{service.title}</h3>
-              <p className="mt-3 text-sm text-[var(--stone)]">{service.excerpt}</p>
-              <ul className="mt-4 space-y-3 text-sm text-[var(--forest)]">
-                {service.benefits.slice(0, 2).map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-2">
-                    <svg
-                      className="mt-1 h-4 w-4 text-[var(--sapin)]"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                    >
-                      <path d="M5 12l4 4 10-9" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex flex-col gap-3 text-sm text-[var(--stone)]">
-                <p className="font-semibold text-[var(--forest)]">Livrables clés</p>
-                <p>{service.deliverables[0]}</p>
-                <p>{service.deliverables[1]}</p>
-              </div>
-              <div className="mt-auto pt-6">
-                <p className="text-xs uppercase tracking-[0.4em] text-[var(--sapin)]">{service.cta}</p>
-              </div>
-            </article>
-          ))}
         </div>
       </section>
 
-      <GeobiologieTabs />
-
-      <section className="section-shell grid gap-10 lg:grid-cols-[0.9fr,1.1fr]">
+      <section className="section-shell">
         <div>
           <p className="text-[11px] uppercase tracking-[0.5em] text-[var(--stone)]">
             Avis Google vérifiés
@@ -327,22 +297,6 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <div className="rounded-[32px] border border-[var(--mist)] bg-white/95 p-4 shadow-[0_25px_60px_rgba(31,59,44,0.08)]">
-          <div className="aspect-video overflow-hidden rounded-[28px] border border-[var(--mist)]">
-            <iframe
-              title="Avis Google de David Michel Géobiologue"
-              src="https://www.google.com/maps?output=embed&q=David+Michel+G%C3%A9obiologue"
-              width="100%"
-              height="100%"
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-          <p className="mt-4 text-sm text-[var(--stone)]">
-            Widget fourni directement par Google Maps. Les notations et commentaires affichés sont ceux de la communauté Google et ne peuvent pas être modifiés depuis ce site.
-          </p>
-        </div>
       </section>
 
       <section className="section-shell grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
@@ -358,7 +312,7 @@ export default function Home() {
             {zones.map((zone) => (
               <div
                 key={zone}
-                className="rounded-2xl border border-[var(--mist)] px-4 py-3 text-center text-[var(--stone)]"
+                className="rounded-2xl border border-[var(--mist)] px-4 py-3 text-center text-[var(--stone)] transition hover:-translate-y-1 hover:border-[var(--sapin)] hover:bg-[var(--sage)]/30 hover:text-[var(--forest)]"
               >
                 {zone}
               </div>

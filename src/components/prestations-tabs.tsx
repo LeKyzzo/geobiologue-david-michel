@@ -738,43 +738,71 @@ export function PrestationsTabs() {
         )}
 
         {activeTab === "soins" && (
-          <div className="mt-6 overflow-x-auto">
-            <div className="flex min-w-full gap-3">
-              {soinsSubTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveSoinsTab(tab.id as SoinsSubTab)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    activeSoinsTab === tab.id
-                      ? "bg-[var(--forest)] text-white"
-                      : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          <div className="relative mt-6">
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 items-center justify-end bg-gradient-to-l from-white to-transparent pr-2 text-[var(--sapin)] md:flex">
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
+                <path d="M5 12h14" strokeLinecap="round" />
+                <path d="M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div className="overflow-x-auto pb-2 pr-8">
+              <div className="flex min-w-full gap-3">
+                {soinsSubTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveSoinsTab(tab.id as SoinsSubTab)}
+                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      activeSoinsTab === tab.id
+                        ? "bg-[var(--forest)] text-white"
+                        : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === "stages" && (
-          <div className="mt-6 overflow-x-auto">
-            <div className="flex min-w-full gap-3">
-              {stageSubTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveStageTab(tab.id as StageSubTab)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    activeStageTab === tab.id
-                      ? "bg-[var(--forest)] text-white"
-                      : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          <div className="relative mt-6">
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 items-center justify-end bg-gradient-to-l from-white to-transparent pr-2 text-[var(--sapin)] md:flex">
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
+                <path d="M5 12h14" strokeLinecap="round" />
+                <path d="M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div className="overflow-x-auto pb-2 pr-8">
+              <div className="flex min-w-full gap-3">
+                {stageSubTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveStageTab(tab.id as StageSubTab)}
+                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      activeStageTab === tab.id
+                        ? "bg-[var(--forest)] text-white"
+                        : "bg-[var(--mist)] text-[var(--forest)] hover:bg-[var(--sage)]/40"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

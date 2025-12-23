@@ -29,7 +29,7 @@ export function PageHero({
   const hasAvatar = Boolean(avatarUrl);
 
   return (
-    <section className="hero-flush relative flex min-h-screen items-center overflow-hidden">
+    <section className="hero-flush relative flex min-h-[100vh] items-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src={imageUrl}
@@ -40,7 +40,7 @@ export function PageHero({
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
       </div>
-      <div className="relative section-shell pt-28 pb-10 text-white md:pt-36 md:pb-14">
+      <div className="relative section-shell pt-24 pb-10 text-white md:pt-28 md:pb-14">
         <div
           className={`mx-auto flex w-full flex-col ${
             hasAvatar

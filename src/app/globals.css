@@ -63,6 +63,10 @@ main {
   gap: var(--space-card);
 }
 
+main > section + section {
+  margin-top: clamp(3rem, 5vw, 4.5rem);
+}
+
 @media (max-width: 768px) {
   .section-shell {
     padding: clamp(2.5rem, 8vw, 3rem) 1.25rem;
