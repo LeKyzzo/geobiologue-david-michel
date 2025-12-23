@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 import Link from "next/link";
+import { HeroTypewriter } from "@/components/hero-typewriter";
 import { prestations } from "@/data/prestations";
 
 const values = [
@@ -110,7 +111,7 @@ const heroHighlights = [
     text: "Diagnostics habitat, terrain et entreprises",
     icon: (
       <svg
-        className="h-6 w-6 text-[var(--sapin)]"
+        className="h-6 w-6"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -125,7 +126,7 @@ const heroHighlights = [
     text: "Sur site ou à distance selon votre projet",
     icon: (
       <svg
-        className="h-6 w-6 text-[var(--sapin)]"
+        className="h-6 w-6"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -159,8 +160,10 @@ export default function Home() {
               Géobiologie & harmonisation de l'habitat
             </p>
             <h1 className="mt-5 text-balance text-[clamp(2.2rem,3.6vw,3.4rem)] font-semibold leading-tight">
-              Retrouver un habitat vivant, aligné et protecteur en Isère et
-              départements limitrophes.
+              Diagnostic & harmonisation géobiologique de votre habitat
+              <span className="mt-2 block text-[clamp(1.4rem,2.6vw,2.2rem)] text-white/85">
+                en <HeroTypewriter phrases={zones} />
+              </span>
             </h1>
             <p className="mt-4 text-base text-white/85 md:text-lg">
               David Michel intervient sur place ou à distance pour neutraliser les
@@ -188,7 +191,7 @@ export default function Home() {
                   key={item.title}
                   className="flex items-start gap-3 rounded-2xl bg-white/10 p-4 text-white/90 backdrop-blur"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white">
                     {item.icon}
                   </span>
                   <div>
