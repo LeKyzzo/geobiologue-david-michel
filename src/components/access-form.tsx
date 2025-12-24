@@ -49,7 +49,7 @@ export function AccessForm({
       )}
       <button
         type="submit"
-        className="mt-6 w-full rounded-full bg-[var(--sapin)] py-3 text-sm font-semibold uppercase tracking-[0.4em] text-white"
+        className="mt-6 w-full min-h-[52px] rounded-full bg-[var(--sapin)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.4em] text-white"
       >
         {buttonLabel}
       </button>

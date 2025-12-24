@@ -22,34 +22,11 @@ type SoinsSubTab =
   | "kinesiologie"
   | "electrosensible";
 
-const galleryImages = {
-  soins: ["/soins/1.png", "/soins/2.png", "/soins/3.png", "/soins/4.png", "/soins/5.png", "/soins/6.png"],
-  menhir: [
-    "/menhir/1.png",
-    "/menhir/2.png",
-    "/menhir/3.png",
-    "/menhir/4.png",
-    "/menhir/5.png",
-    "/menhir/6.png",
-  ],
-  sourcier: [
-    "/sourcier/1.png",
-    "/sourcier/2.png",
-    "/sourcier/3.png",
-    "/sourcier/4.png",
-    "/sourcier/5.png",
-    "/sourcier/6.png",
-  ],
-} as const;
+type GalleryKey = "soins" | "menhir" | "sourcier";
 
-type GalleryKey = keyof typeof galleryImages;
-
-const getGalleryPortion = (key: GalleryKey, part: "primary" | "secondary") => {
-  const images = galleryImages[key];
-  const splitIndex = Math.ceil(images.length / 2);
-  const subset = part === "primary" ? images.slice(0, splitIndex) : images.slice(splitIndex);
-  return subset.length > 0 ? subset : images;
-};
+interface PrestationsTabsProps {
+  galleries: Record<GalleryKey, string[]>;
+}
 
 const mainTabs: { id: MainTab; label: string; description: string; galleryKey?: GalleryKey }[] = [
   {
@@ -98,15 +75,15 @@ const sectionClass = "space-y-3 rounded-3xl border border-[var(--mist)]/80 bg-wh
 const listClass = "list-disc pl-5 text-sm text-[var(--stone)]";
 
 const PhotoGrid = ({ images, label }: { images: readonly string[]; label: string }) => (
-  <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5">
     {images.map((src, index) => (
-      <figure key={src} className="relative h-32 overflow-hidden rounded-2xl md:h-40">
+      <figure key={`${label}-${src}`} className="relative h-28 overflow-hidden rounded-2xl sm:h-32 lg:h-36">
         <Image
           src={src}
           alt={`${label} ${index + 1}`}
           fill
           className="object-cover"
-          sizes="(min-width: 1024px) 220px, 45vw"
+          sizes="(min-width: 1280px) 180px, (min-width: 768px) 33vw, 45vw"
         />
       </figure>
     ))}
@@ -118,7 +95,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "therapie-energetique":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Soins énergétiques professionnels
@@ -164,7 +140,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "degagement":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Soin de dégagement
@@ -203,7 +178,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "transgenerationnel":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Analyse transgénérationnelle
@@ -242,7 +216,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "psychanalyse":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Psychanalyse
@@ -273,7 +246,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "kinesiologie":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Kinésiologie
@@ -312,7 +284,6 @@ const renderSoinsContent = (tab: SoinsSubTab) => {
     case "electrosensible":
       return (
         <div className="space-y-8">
-          <PhotoGrid images={getGalleryPortion("soins", "primary")} label="Galerie soins" />
           <div className={sectionClass}>
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
               Protection électrosensible
@@ -458,7 +429,6 @@ const renderStagesContent = (tab: StageSubTab) => {
 
 const menhirContent = (
   <div className="space-y-8">
-    <PhotoGrid images={getGalleryPortion("menhir", "primary")} label="Galerie menhir" />
     <div className={sectionClass}>
       <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
         Pose de menhir et pierres levées
@@ -491,7 +461,6 @@ const menhirContent = (
 
 const sourcierContent = (
   <div className="space-y-8">
-    <PhotoGrid images={getGalleryPortion("sourcier", "primary")} label="Galerie sourcier" />
     <div className={sectionClass}>
       <p className="text-xs font-semibold uppercase tracking-[0.5em] text-[var(--sapin)]">
         Mise en place de puits
@@ -522,7 +491,7 @@ const sourcierContent = (
   </div>
 );
 
-export function PrestationsTabs() {
+export function PrestationsTabs({ galleries }: PrestationsTabsProps) {
   const [activeTab, setActiveTab] = useState<MainTab>("soins");
   const [activeSoinsTab, setActiveSoinsTab] = useState<SoinsSubTab>("therapie-energetique");
   const [activeStageTab, setActiveStageTab] = useState<StageSubTab>("stage-sourcier");
@@ -631,13 +600,23 @@ export function PrestationsTabs() {
             </div>
           </div>
 
-          {currentMain?.galleryKey && (
+        </div>
+        {currentMain?.galleryKey && (
+          <div className="mt-12 space-y-4 border-t border-[var(--mist)] pt-10">
+            <div className="flex flex-col gap-1 text-center">
+              <p className="text-[11px] uppercase tracking-[0.4em] text-[var(--stone)]">
+                Galerie {currentMain.label.toLowerCase()}
+              </p>
+              <p className="text-xl font-semibold text-[var(--forest)]">
+                {galleries[currentMain.galleryKey]?.length ?? 0} photos terrain
+              </p>
+            </div>
             <PhotoGrid
-              images={getGalleryPortion(currentMain.galleryKey, "secondary")}
+              images={galleries[currentMain.galleryKey] ?? []}
               label={`Galerie ${currentMain.label.toLowerCase()}`}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
