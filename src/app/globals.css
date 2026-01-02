@@ -72,3 +72,30 @@ main > section + section {
     padding: clamp(2.5rem, 8vw, 3rem) 1.25rem;
   }
 }
+
+.reviews-scroll-area {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sapin) transparent;
+  padding-bottom: 0.5rem;
+}
+
+.reviews-scroll-area::-webkit-scrollbar {
+  height: 6px;
+}
+
+.reviews-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reviews-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(47, 92, 77, 0.8);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-scroll-area {
+    scroll-behavior: auto;
+  }
+}

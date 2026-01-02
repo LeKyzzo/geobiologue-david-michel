@@ -1,44 +1,81 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
-import { useFormStatus } from "react-dom";
-import type { ContactFormState } from "@/actions/contact-actions";
-import { sendContactMessage } from "@/actions/contact-actions";
+import { FormEvent, useRef, useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
-const initialState: ContactFormState = { status: "idle" };
+import { db } from "@/lib/firebase";
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+type ContactStatus = "idle" | "loading" | "success" | "error";
 
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="mt-6 w-full rounded-full bg-[var(--sapin)] py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
-    >
-      {pending ? "Envoi en cours..." : "Envoyer ma demande"}
-    </button>
-  );
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  message?: string;
+  type?: string;
 }
 
 export function ContactForm() {
-  const [state, formAction] = useActionState<ContactFormState, FormData>(
-    sendContactMessage,
-    initialState,
-  );
   const formRef = useRef<HTMLFormElement>(null);
+  const [status, setStatus] = useState<ContactStatus>("idle");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
 
-  useEffect(() => {
-    if (state.status === "success") {
-      formRef.current?.reset();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setStatus("idle");
+    setStatusMessage(null);
+    setErrors({});
+
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get("name")?.toString().trim() ?? "";
+    const email = formData.get("email")?.toString().trim() ?? "";
+    const phone = formData.get("phone")?.toString().trim() ?? "";
+    const type = formData.get("type")?.toString().trim() ?? "";
+    const message = formData.get("message")?.toString().trim() ?? "";
+
+    const nextErrors: FieldErrors = {};
+    if (!name) nextErrors.name = "Merci de préciser votre nom.";
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextErrors.email = "Adresse email invalide.";
     }
-  }, [state.status]);
+    if (!type) nextErrors.type = "Sélectionnez le type de lieu.";
+    if (!message) nextErrors.message = "Merci de décrire votre besoin.";
+
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors);
+      setStatus("error");
+      setStatusMessage("Certaines informations sont manquantes.");
+      return;
+    }
+
+    setStatus("loading");
+
+    try {
+      await addDoc(collection(db, "message"), {
+        name,
+        email,
+        phone: phone || null,
+        type,
+        comment: message,
+        status: "new",
+        createdAt: serverTimestamp(),
+      });
+
+      formRef.current?.reset();
+      setStatus("success");
+      setStatusMessage("Merci, votre message a bien été enregistré. Je vous réponds rapidement.");
+    } catch (error) {
+      console.error("Contact form Firestore error", error);
+      setStatus("error");
+      setStatusMessage("Impossible d'enregistrer votre message pour le moment.");
+    }
+  };
 
   return (
     <form
       ref={formRef}
-      action={formAction}
-      className="rounded-[32px] border border-[var(--mist)] bg-white/95 p-[var(--space-card)] shadow-xl shadow-[var(--forest)]/10"
+      onSubmit={handleSubmit}
+      className="rounded-[32px] bg-white/95 p-[var(--space-card)] "
     >
       <p className="text-sm font-semibold text-[var(--sapin)]">Formulaire de contact</p>
       <p className="mt-1 text-sm text-[var(--stone)]">
@@ -54,8 +91,8 @@ export function ContactForm() {
             required
             className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
           />
-          {state.errors?.name && (
-            <span className="mt-1 block text-sm text-red-600">{state.errors.name}</span>
+          {errors.name && (
+            <span className="mt-1 block text-sm text-red-600">{errors.name}</span>
           )}
         </label>
         <label className="text-sm font-semibold text-[var(--forest)]">
@@ -67,8 +104,8 @@ export function ContactForm() {
             required
             className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
           />
-          {state.errors?.email && (
-            <span className="mt-1 block text-sm text-red-600">{state.errors.email}</span>
+          {errors.email && (
+            <span className="mt-1 block text-sm text-red-600">{errors.email}</span>
           )}
         </label>
         <label className="text-sm font-semibold text-[var(--forest)]">
@@ -93,8 +130,8 @@ export function ContactForm() {
             <option>Lieu professionnel</option>
             <option>Autre projet</option>
           </select>
-          {state.errors?.type && (
-            <span className="mt-1 block text-sm text-red-600">{state.errors.type}</span>
+          {errors.type && (
+            <span className="mt-1 block text-sm text-red-600">{errors.type}</span>
           )}
         </label>
         <label className="text-sm font-semibold text-[var(--forest)]">
@@ -105,22 +142,29 @@ export function ContactForm() {
             required
             className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
           />
-          {state.errors?.message && (
-            <span className="mt-1 block text-sm text-red-600">{state.errors.message}</span>
+          {errors.message && (
+            <span className="mt-1 block text-sm text-red-600">{errors.message}</span>
           )}
         </label>
       </div>
-      {state.status === "success" && (
-        <p className="mt-4 rounded-2xl bg-[var(--sage)]/30 px-4 py-3 text-sm font-semibold text-[var(--forest)]">
-          {state.message}
+      {statusMessage && (
+        <p
+          className={`mt-4 rounded-2xl px-4 py-3 text-sm font-semibold ${
+            status === "success"
+              ? "bg-[var(--sage)]/30 text-[var(--forest)]"
+              : "bg-red-50 text-red-700"
+          }`}
+        >
+          {statusMessage}
         </p>
       )}
-      {state.status === "error" && state.message && (
-        <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-          {state.message}
-        </p>
-      )}
-      <SubmitButton />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="mt-6 w-full rounded-full bg-[var(--sapin)] py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {status === "loading" ? "Envoi en cours..." : "Envoyer ma demande"}
+      </button>
     </form>
   );
 }

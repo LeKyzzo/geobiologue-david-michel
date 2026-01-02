@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroTypewriter } from "@/components/hero-typewriter";
 import { GeobiologieTabs } from "@/components/geobiologie-tabs";
+import { ReviewsMarquee } from "@/components/reviews-marquee";
 
 
 const zones = [
@@ -152,6 +153,8 @@ export default function Home() {
       </section>
 
       <GeobiologieTabs />
+
+  <ReviewsMarquee />
 
       <section className="section-shell">
         <div className="rounded-[36px] border border-[var(--mist)] bg-white/90 p-[var(--space-card)] shadow-[0_30px_70px_rgba(5,24,16,0.08)]">

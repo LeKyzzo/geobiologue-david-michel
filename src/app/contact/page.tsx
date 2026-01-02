@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ContactForm } from "@/components/contact-form";
+import { ContactTabs } from "@/components/contact-tabs";
 
 const contactHighlights = [
   {
@@ -106,59 +106,31 @@ const contactChannels = [
   },
 ];
 
-const quickContacts = contactChannels.slice(0, 2);
 const addressChannel = contactChannels.find((channel) => channel.label === "Adresse");
 
 export default function ContactPage() {
   return (
     <>
       <section className="section-shell pt-28 md:pt-32">
-        <div className="grid gap-8 rounded-[48px] bg-gradient-to-br from-[var(--forest)] via-[var(--sapin)] to-[var(--sapin)]/90 p-[var(--space-card)] text-white shadow-[0_30px_80px_rgba(5,24,16,0.35)] lg:grid-cols-[1.1fr,0.9fr]">
-          <div>
-            <p className="text-sm font-semibold text-white/70">Contact</p>
-            <h1 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
-              Parlons de votre lieu. Réponse sous 24h.
-            </h1>
-            <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
-              Décrivez le type de lieu, les symptômes observés et vos disponibilités. Je reviens vers vous avec une proposition d&rsquo;intervention adaptée.
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <span className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                Disponibilités étendues
-              </span>
-              <Link
-                href="tel:+33658021724"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--forest)]"
-              >
-                Appeler directement
-              </Link>
-            </div>
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.4em] text-[var(--stone)]">Contact</p>
+          <h1 className="mt-4 text-3xl font-semibold text-[var(--forest)] md:text-4xl">
+            Parlons de votre lieu, réponse sous 24h
+          </h1>
+          <p className="mt-4 text-base text-[var(--stone)]">
+            Résumez votre problématique et vos disponibilités ci-dessous. Je reviens vers vous rapidement avec un diagnostic et les étapes proposées.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link
+              href="tel:+33658021724"
+              className="inline-flex items-center justify-center rounded-full bg-[var(--forest)] px-6 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+            >
+              Appeler directement
+            </Link>
           </div>
-          <div className="rounded-[32px] bg-white/10 p-6">
-            <p className="text-sm font-semibold text-white/80">Coordonnées clés</p>
-            <ul className="mt-4 space-y-4">
-              {quickContacts.map((channel) => (
-                <li key={channel.label} className="flex items-start gap-4">
-                  <span className="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
-                    {channel.icon}
-                  </span>
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-white/70">{channel.label}</p>
-                    {channel.href ? (
-                      <Link href={channel.href} className="text-lg font-semibold text-white">
-                        {channel.value}
-                      </Link>
-                    ) : (
-                      <p className="text-lg font-semibold text-white">{channel.value}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 text-sm text-white/70">
-              Joignable du lundi au samedi, 8h30 à 20h, créneaux urgents possibles selon le planning.
-            </p>
-          </div>
+        </div>
+        <div id="contact-tabs" className="mx-auto mt-10 max-w-5xl">
+          <ContactTabs channels={contactChannels} />
         </div>
       </section>
 
@@ -176,43 +148,18 @@ export default function ContactPage() {
         ))}
       </section>
 
-      <section className="section-shell grid gap-8 md:grid-cols-[1.15fr,0.85fr]">
-        <div className="space-y-6">
-          <ContactForm />
-          <div className="overflow-hidden rounded-[32px] border border-[var(--mist)] shadow-lg shadow-[var(--forest)]/10">
-            <iframe
-              title="Localisation de David Michel"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2786.202992894505!2d5.829!3d45.1382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478aa30747779f09%3A0x8a5c9d42c1e1d2e4!2sSaint-Martin-d%27Uriage!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr"
-              width="100%"
-              height="300"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        </div>
-        <div>
-          <div className="rounded-[28px] bg-[var(--sapin)]/90 p-[var(--space-card)] text-white">
-            <p className="text-sm font-semibold text-[var(--sage)]">Zones d&rsquo;intervention</p>
-            <p className="mt-2 text-white/85">
-              Ain · Ardèche · Creuse · Drôme · Gard · Hautes-Alpes · Hautes-Loire · Hautes-Vienne · Indre · Isère · Loire · Puy de dôme · Rhône · Saône-et-loire · Vaucluse · Vienne
-            </p>
-          </div>
-          {addressChannel && (
-            <div className="mt-6 rounded-[28px] border border-[var(--mist)] bg-white/95 p-[var(--space-card)] text-[var(--forest)]">
-              <p className="text-sm font-semibold text-[var(--pine)]">Adresse du cabinet</p>
-              <div className="mt-3 flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--mist)]/60 text-[var(--forest)]">
-                  {addressChannel.icon}
-                </span>
-                <div>
-                  <p className="text-base font-semibold leading-snug">{addressChannel.value}</p>
-                  <p className="text-xs uppercase tracking-[0.3em] text-[var(--pine)]/70">Saint-Martin-d&rsquo;Uriage</p>
-                </div>
-              </div>
-            </div>
-          )}
+      <section className="section-shell">
+        <div className="overflow-hidden rounded-[32px] border border-[var(--mist)] bg-white/95 shadow-lg shadow-[var(--forest)]/10">
+          <iframe
+            title="Localisation de David Michel"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2786.202992894505!2d5.829!3d45.1382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478aa30747779f09%3A0x8a5c9d42c1e1d2e4!2sSaint-Martin-d%27Uriage!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr"
+            width="100%"
+            height="380"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </section>
     </>
