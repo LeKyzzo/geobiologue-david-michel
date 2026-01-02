@@ -124,7 +124,7 @@ export default function Home() {
                   key={item.title}
                   className="flex items-start gap-3 rounded-2xl bg-white/10 p-4 text-white/90 backdrop-blur"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full text-white">
                     {item.icon}
                   </span>
                   <div>
