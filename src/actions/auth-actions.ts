@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { ADMIN_COOKIE, PRODUCT_COOKIE } from '@/lib/auth';
+import { ADMIN_COOKIE, PRODUCT_COOKIE, adminTokenForSession, productTokenForSession } from '@/lib/auth';
 
 export interface AuthFormState {
   error?: string;
@@ -34,7 +34,10 @@ export async function verifyProductCode(
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(PRODUCT_COOKIE, 'granted', cookieBase);
+  cookieStore.set(PRODUCT_COOKIE, productTokenForSession(), {
+    ...cookieBase,
+    maxAge: 60 * 60 * 4,
+  });
   redirect('/produits');
   return {};
 }
@@ -54,7 +57,16 @@ export async function verifyAdminCode(
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(ADMIN_COOKIE, 'granted', cookieBase);
+  cookieStore.set(ADMIN_COOKIE, adminTokenForSession(), {
+    ...cookieBase,
+    maxAge: 60 * 60 * 2,
+  });
   redirect('/admin');
   return {};
+}
+
+export async function logoutAdmin() {
+  const cookieStore = await cookies();
+  cookieStore.delete(ADMIN_COOKIE);
+  redirect('/admin/connexion');
 }

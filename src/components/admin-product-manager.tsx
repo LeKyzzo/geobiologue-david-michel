@@ -1,9 +1,37 @@
 "use client";
 
-import { FormEvent, useState, useTransition } from "react";
+import { FormEvent, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import type { Product } from "@/types/product";
+import {
+  createProductDocument,
+  deleteProductDocument,
+  updateProductDocument,
+} from "@/lib/products";
+import { fileToDataUrl } from "@/lib/uploads";
+
+const currencyFormatter = new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 2,
+});
+
+function parseHighlightsValue(raw: FormDataEntryValue | null): string[] {
+  return raw
+    ?.toString()
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean) ?? [];
+}
+
+function parsePriceValue(raw: FormDataEntryValue | null): number {
+  const value = raw?.toString().replace(",", ".") ?? "";
+  const price = Number(value);
+  if (!Number.isFinite(price) || price <= 0) {
+    throw new Error("Prix invalide");
+  }
+  return Math.round(price * 100) / 100;
+}
 
 type ModalMode = "create" | "edit" | null;
 
@@ -14,60 +42,100 @@ interface AdminProductManagerProps {
 export function AdminProductManager({
   products,
 }: AdminProductManagerProps) {
-  const router = useRouter();
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
 
-  const mutateProducts = (
-    formData: FormData,
-    method: "POST" | "PUT" | "DELETE",
-    onSuccess?: () => void,
-  ) => {
-    startTransition(async () => {
-      setActionError(null);
-      try {
-        const response = await fetch("/api/admin/products", {
-          method,
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const payload = await response.json().catch(() => null);
-          setActionError(payload?.error ?? "Impossible d'enregistrer les modifications.");
-          return;
-        }
-
-        onSuccess?.();
-        router.refresh();
-      } catch (error) {
-        console.error("Échec de l'appel API", error);
-        setActionError("Connexion impossible au serveur admin.");
-      }
-    });
-  };
-
-  const handleCreate = (event: FormEvent<HTMLFormElement>) => {
+  const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    mutateProducts(formData, "POST", () => {
+    setIsPending(true);
+    setActionError(null);
+    try {
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const imageFile = formData.get("imageFile");
+      if (!(imageFile instanceof File) || imageFile.size === 0) {
+        throw new Error("Image obligatoire");
+      }
+      const image = await fileToDataUrl(imageFile);
+      const price = parsePriceValue(formData.get("price"));
+      await createProductDocument({
+        name: formData.get("name")?.toString().trim() ?? "",
+        description: formData.get("description")?.toString().trim() ?? "",
+        image,
+        highlights: parseHighlightsValue(formData.get("highlights")),
+        ritual: formData.get("ritual")?.toString().trim() || undefined,
+        price,
+      });
       form.reset();
       closeModal();
-    });
+    } catch (error) {
+      console.error(error);
+      setActionError("Impossible de créer le produit.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const handleUpdate = (event: FormEvent<HTMLFormElement>) => {
+  const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    mutateProducts(formData, "PUT", closeModal);
+    if (!selectedProduct) return;
+    setIsPending(true);
+    setActionError(null);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const imageFile = formData.get("imageFile");
+      let image = selectedProduct.image;
+      if (imageFile instanceof File && imageFile.size > 0) {
+        image = await fileToDataUrl(imageFile);
+      }
+
+      const nextPrice = (() => {
+        try {
+          return parsePriceValue(formData.get("price"));
+        } catch {
+          return selectedProduct.price ?? null;
+        }
+      })();
+
+      await updateProductDocument(selectedProduct.id, {
+        name: formData.get("name")?.toString().trim() || selectedProduct.name,
+        description: formData.get("description")?.toString().trim() || selectedProduct.description,
+        image,
+        highlights: (() => {
+          const parsed = parseHighlightsValue(formData.get("highlights"));
+          return parsed.length ? parsed : selectedProduct.highlights;
+        })(),
+        ritual: formData.get("ritual")?.toString().trim() || selectedProduct.ritual,
+        price: nextPrice,
+      });
+      closeModal();
+    } catch (error) {
+      console.error(error);
+      setActionError("Mise à jour impossible.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const handleDelete = (event: FormEvent<HTMLFormElement>) => {
+  const handleDelete = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    mutateProducts(formData, "DELETE");
+    setIsPending(true);
+    setActionError(null);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const id = formData.get("id")?.toString();
+      if (!id) {
+        throw new Error("ID manquant");
+      }
+      await deleteProductDocument(id);
+    } catch (error) {
+      console.error(error);
+      setActionError("Suppression impossible.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const openCreate = () => {
@@ -128,6 +196,7 @@ export function AdminProductManager({
                 alt={product.name}
                 fill
                 className="object-cover"
+                unoptimized
                 sizes="(min-width: 768px) 50vw, 100vw"
               />
             </div>
@@ -137,6 +206,9 @@ export function AdminProductManager({
                   {product.name}
                 </h2>
                 <p className="text-sm text-[var(--stone)]">{product.description}</p>
+                <p className="text-lg font-semibold text-[var(--sapin)]">
+                  {product.price ? currencyFormatter.format(product.price) : "Tarif communiqué sur devis"}
+                </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -229,6 +301,17 @@ function CreateProductForm({
           />
         </label>
         <label className="md:col-span-2 text-sm font-semibold text-[var(--forest)]">
+          Prix (EUR)
+          <input
+            type="number"
+            name="price"
+            min="0"
+            step="0.01"
+            required
+            className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
+          />
+        </label>
+        <label className="md:col-span-2 text-sm font-semibold text-[var(--forest)]">
           Description
           <textarea
             name="description"
@@ -298,13 +381,24 @@ function EditProductForm({
       </div>
       <form onSubmit={onSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
         <input type="hidden" name="id" value={product.id} />
-        <input type="hidden" name="currentImage" value={product.image} />
         <label className="md:col-span-2 text-sm font-semibold text-[var(--forest)]">
           Nom
           <input
             type="text"
             name="name"
             defaultValue={product.name}
+            required
+            className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
+          />
+        </label>
+        <label className="md:col-span-2 text-sm font-semibold text-[var(--forest)]">
+          Prix (EUR)
+          <input
+            type="number"
+            name="price"
+            min="0"
+            step="0.01"
+            defaultValue={product.price ?? undefined}
             required
             className="mt-1 w-full rounded-2xl border border-[var(--mist)] px-4 py-3 focus:border-[var(--sapin)] focus:outline-none"
           />
@@ -322,7 +416,7 @@ function EditProductForm({
         <label className="md:col-span-2 text-sm font-semibold text-[var(--forest)]">
           Image actuelle
           <span className="mt-1 block rounded-2xl border border-[var(--mist)] px-4 py-3 text-sm text-[var(--stone)]">
-            {product.image}
+            Image encodée (data)
           </span>
         </label>
         <label className="text-sm font-semibold text-[var(--forest)] md:col-span-2">

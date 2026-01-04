@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Sora, Work_Sans as WorkSans } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
@@ -45,6 +46,31 @@ export default function RootLayout({
       <body
         className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
+        <Script id="performance-measure-guard" strategy="beforeInteractive">
+          {`
+          (function(){
+            if (typeof performance === 'undefined' || typeof performance.measure !== 'function') {
+              return;
+            }
+            var originalMeasure = performance.measure.bind(performance);
+            performance.measure = function(){
+              try {
+                return originalMeasure.apply(performance, arguments);
+              } catch (error) {
+                if (
+                  error &&
+                  typeof error.message === 'string' &&
+                  error.message.toLowerCase().includes('negative time stamp')
+                ) {
+                  console.warn('Measurement ignored due to negative timestamp.');
+                  return;
+                }
+                throw error;
+              }
+            };
+          })();
+        `}
+        </Script>
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
           <main className="flex-1">{children}</main>

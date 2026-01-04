@@ -4,6 +4,7 @@
     "name": "Encens Alchimique universel",
     "description": "Encens élaboré selon un procédé alchimique lunaire pour purifier les lieux et soutenir les rituels de libération.",
     "image": "/produits/encens.png",
+    "price": 72,
     "highlights": [
       "Poudres végétales consacrées par David",
       "Montée progressive pour accompagner les prières",
@@ -16,6 +17,7 @@
     "name": "Sel noir d'Hawaï alchimique exorcisé",
     "description": "Sel volcanique magnétisé, utilisé pour sceller les seuils et absorber les mémoires lourdes.",
     "image": "/produits/sel-noir.png",
+    "price": 48,
     "highlights": [
       "Rechargé sur les réseaux telluriques positifs",
       "Action immédiate sur les points d'entrée",
@@ -28,6 +30,7 @@
     "name": "Condensateur alchimique des quatre éléments",
     "description": "Pièce soufflée en atelier, programmée pour rééquilibrer l'eau, l'air, le feu et la terre dans un même volume.",
     "image": "/produits/condensateur.png",
+    "price": 240,
     "highlights": [
       "Soufflé individuellement et numéroté",
       "Champ harmonique de 80 m²",
@@ -40,6 +43,7 @@
     "name": "Bougie Rituel Ancestral aux herbes alchimiques",
     "description": "Bougie coulée à la main avec des macérats de plantes sacrées pour soutenir les rituels de passage.",
     "image": "/produits/bougie.png",
+    "price": 68,
     "highlights": [
       "Infusion à froid de 12 herbes alchimiques",
       "Durée de combustion moyenne de 40 h",

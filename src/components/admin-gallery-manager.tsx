@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, useTransition, type ChangeEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useState, type ChangeEvent } from "react";
 import type { GalleryCategory, GalleryItem } from "@/lib/gallery";
+import { addGalleryItem, deleteGalleryItemDocument } from "@/lib/gallery";
+import { fileToDataUrl } from "@/lib/uploads";
 
 const galleryTabs: { id: GalleryCategory; label: string }[] = [
   { id: "soins", label: "Soins" },
@@ -12,92 +13,59 @@ const galleryTabs: { id: GalleryCategory; label: string }[] = [
 ];
 
 interface AdminGalleryManagerProps {
-  initialImages: Record<GalleryCategory, GalleryItem[]>;
+  galleries: Record<GalleryCategory, GalleryItem[]>;
 }
 
-type GalleryState = Record<GalleryCategory, GalleryItem[]>;
-
-export function AdminGalleryManager({ initialImages }: AdminGalleryManagerProps) {
-  const router = useRouter();
+export function AdminGalleryManager({ galleries }: AdminGalleryManagerProps) {
   const [activeCategory, setActiveCategory] = useState<GalleryCategory>("soins");
-  const [images, setImages] = useState<GalleryState>(initialImages);
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ category: GalleryCategory; fileName: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ category: GalleryCategory; documentId: string; fileName: string } | null>(null);
 
   const triggerUpload = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
-    const formData = new FormData();
-    formData.append("category", activeCategory);
-    formData.append("imageFile", file);
-    mutateGallery(formData, "POST");
+    setIsPending(true);
+    setError(null);
+    try {
+      const src = await fileToDataUrl(file);
+      await addGalleryItem(activeCategory, { fileName: file.name, src });
+    } catch (err) {
+      console.error(err);
+      setError("Impossible d'ajouter la photo.");
+    } finally {
+      setIsPending(false);
+      event.target.value = "";
+    }
     event.target.value = "";
   };
 
-  const mutateGallery = (formData: FormData, method: "POST" | "DELETE") => {
-    startTransition(async () => {
-      setError(null);
-      try {
-        const response = await fetch("/api/admin/gallery", { method, body: formData });
-        const payload = await response.json().catch(() => null);
-        if (!response.ok || !payload?.ok) {
-          setError(payload?.error ?? "Opération impossible");
-          return;
-        }
-
-        if (method === "POST" && payload.item) {
-          const { category, fileName, src } = payload.item as {
-            category: GalleryCategory;
-            fileName: string;
-            src: string;
-          };
-          setImages((prev) => ({
-            ...prev,
-            [category]: [{ fileName, src }, ...(prev[category] ?? [])],
-          }));
-        }
-
-        if (method === "DELETE" && payload.result) {
-          const { category, fileName } = payload.result as {
-            category: GalleryCategory;
-            fileName: string;
-          };
-          setImages((prev) => ({
-            ...prev,
-            [category]: (prev[category] ?? []).filter((image) => image.fileName !== fileName),
-          }));
-        }
-
-        router.refresh();
-      } catch (err) {
-        console.error(err);
-        setError("Impossible de contacter le serveur.");
-      }
-    });
+  const openDeleteModal = (category: GalleryCategory, image: GalleryItem) => {
+    setDeleteTarget({ category, documentId: image.id, fileName: image.fileName });
   };
 
-  const openDeleteModal = (category: GalleryCategory, fileName: string) => {
-    setDeleteTarget({ category, fileName });
-  };
-
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    const formData = new FormData();
-    formData.append("category", deleteTarget.category);
-    formData.append("fileName", deleteTarget.fileName);
-    mutateGallery(formData, "DELETE");
-    setDeleteTarget(null);
+    setIsPending(true);
+    setError(null);
+    try {
+      await deleteGalleryItemDocument(deleteTarget.category, deleteTarget.documentId);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error(err);
+      setError("Suppression impossible.");
+    } finally {
+      setIsPending(false);
+    }
   };
-
-  const currentImages = images[activeCategory] ?? [];
+  const currentImages = galleries[activeCategory] ?? [];
 
   return (
     <div className="space-y-8">
@@ -149,7 +117,7 @@ export function AdminGalleryManager({ initialImages }: AdminGalleryManagerProps)
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/png,image/jpg,image/jpeg"
+            accept="image/*"
             className="hidden"
             onChange={handleFileChange}
           />
@@ -158,15 +126,15 @@ export function AdminGalleryManager({ initialImages }: AdminGalleryManagerProps)
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {currentImages.map((image) => (
-          <figure key={image.fileName} className="relative overflow-hidden rounded-3xl border border-[var(--mist)] bg-white">
+          <figure key={image.id} className="relative overflow-hidden rounded-3xl border border-[var(--mist)] bg-white">
             <div className="relative h-48 w-full">
-              <Image src={image.src} alt={image.fileName} fill className="object-cover" sizes="(min-width: 1024px) 25vw, 50vw" />
+              <Image src={image.src} alt={image.fileName} fill className="object-cover" sizes="(min-width: 1024px) 25vw, 50vw" unoptimized />
             </div>
             <figcaption className="flex items-center justify-between px-4 py-3 text-sm text-[var(--stone)]">
               <span className="truncate">{image.fileName}</span>
               <button
                 type="button"
-                onClick={() => openDeleteModal(activeCategory, image.fileName)}
+                onClick={() => openDeleteModal(activeCategory, image)}
                 className="ml-2 flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
                 aria-label="Supprimer la photo"
               >

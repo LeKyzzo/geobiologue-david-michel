@@ -37,6 +37,14 @@
   box-sizing: border-box;
 }
 
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+
 body {
   background: radial-gradient(circle at top, var(--mist), var(--background));
   color: var(--foreground);

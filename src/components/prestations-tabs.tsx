@@ -83,6 +83,7 @@ const PhotoGrid = ({ images, label }: { images: readonly string[]; label: string
           alt={`${label} ${index + 1}`}
           fill
           className="object-cover"
+          unoptimized
           sizes="(min-width: 1280px) 180px, (min-width: 768px) 33vw, 45vw"
         />
       </figure>

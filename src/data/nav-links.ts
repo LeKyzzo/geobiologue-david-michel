@@ -9,5 +9,5 @@ export const navLinks: NavLink[] = [
   { label: "Prestations", href: "/prestations" },
   { label: "Qui suis-je ?", href: "/qui-suis-je" },
   { label: "Contact", href: "/contact" },
-  { label: "Espace privé", href: "/espace-prive" },
+  { label: "Produits", href: "/produits-artisanaux" },
 ];

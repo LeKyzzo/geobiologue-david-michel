@@ -151,7 +151,7 @@ export function ReviewsMarquee() {
       setFormState(defaultFormState);
       closeForm(true);
       setSuccessMessage("Avis envoyé ! Il apparaîtra après validation.");
-    } catch (err) {
+    } catch {
       setFormError("Impossible d'ajouter l'avis pour le moment.");
     } finally {
       setSubmitting(false);

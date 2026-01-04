@@ -106,8 +106,6 @@ const contactChannels = [
   },
 ];
 
-const addressChannel = contactChannels.find((channel) => channel.label === "Adresse");
-
 export default function ContactPage() {
   return (
     <>

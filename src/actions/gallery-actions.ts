@@ -1,14 +1,15 @@
 "use server";
 
-import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import {
-  allowedGalleryExtensions,
-  getGalleryDir,
+  addGalleryItem,
+  deleteGalleryItem,
   galleryCategories,
+  getGalleryItem,
   type GalleryCategory,
 } from "@/lib/gallery";
+import { uploadFormFileToStorage, deleteFromStorage } from "@/lib/storage";
 
 function assertCategory(value: FormDataEntryValue | null): GalleryCategory {
   if (typeof value === "string" && galleryCategories.includes(value as GalleryCategory)) {
@@ -24,50 +25,49 @@ function getFileFromForm(value: FormDataEntryValue | null): File {
   throw new Error("Fichier image manquant");
 }
 
-function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "");
-}
-
-const DEFAULT_EXTENSION = ".png";
+const allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
 export async function uploadGalleryImage(formData: FormData) {
   const category = assertCategory(formData.get("category"));
   const file = getFileFromForm(formData.get("imageFile"));
 
-  const extension = (path.extname(file.name) || DEFAULT_EXTENSION).toLowerCase();
-  if (!allowedGalleryExtensions.has(extension)) {
-    throw new Error("Format autorisé : PNG, JPG ou JPEG");
+  const extension = (path.extname(file.name) || ".png").toLowerCase();
+  if (!allowedExtensions.has(extension)) {
+    throw new Error("Format autorisé : PNG, JPG, JPEG ou WEBP");
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const fileName = `${category}-${Date.now()}-${crypto.randomUUID()}${extension}`;
-  const destinationDir = getGalleryDir(category);
-  await mkdir(destinationDir, { recursive: true });
-  await writeFile(path.join(destinationDir, fileName), buffer);
+  const upload = await uploadFormFileToStorage(file, {
+    folder: path.posix.join("gallery", category),
+    baseName: path.parse(file.name).name,
+  });
+
+  const item = await addGalleryItem(category, {
+    fileName: file.name,
+    src: upload.url,
+    storagePath: upload.storagePath,
+  });
 
   revalidatePath("/prestations");
   revalidatePath("/admin");
-
-  return { category, fileName, src: `/${category}/${fileName}` };
+  return { category, fileName: item.fileName, src: item.src, id: item.id, storagePath: item.storagePath };
 }
 
 export async function deleteGalleryImage(formData: FormData) {
   const category = assertCategory(formData.get("category"));
-  const fileName = sanitizeFileName(formData.get("fileName")?.toString() ?? "");
-  if (!fileName) {
-    throw new Error("Fichier introuvable");
+  const documentId = formData.get("documentId")?.toString();
+  if (!documentId) {
+    throw new Error("Image introuvable");
   }
 
-  try {
-    await unlink(path.join(getGalleryDir(category), fileName));
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      throw error;
-    }
+  const existing = await getGalleryItem(category, documentId);
+  if (!existing) {
+    throw new Error("Image introuvable");
   }
+
+  await deleteGalleryItem(category, documentId);
+  await deleteFromStorage(existing.storagePath);
 
   revalidatePath("/prestations");
   revalidatePath("/admin");
-
-  return { category, fileName };
+  return { category, id: documentId };
 }

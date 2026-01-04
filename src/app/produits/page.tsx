@@ -1,14 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
 import { requireProductAccess } from "@/lib/auth";
-import { getProducts } from "@/lib/products";
-import { ProductGrid } from "@/components/product-grid";
+import { ProductsCatalogue } from "@/app/produits/products-catalogue";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   await requireProductAccess();
-  const products = await getProducts();
 
   return (
     <>
@@ -36,7 +34,7 @@ export default async function ProductsPage() {
       </section>
 
       <section className="section-shell">
-        <ProductGrid products={products} />
+        <ProductsCatalogue />
         <p className="mt-10 text-sm text-[var(--stone)]">
           Besoin d'un conseil personnalisé ? Contactez-moi avant toute commande afin
           d'ajuster les dosages, les programmations et le suivi énergétique.

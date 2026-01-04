@@ -5,4 +5,5 @@ export interface Product {
   image: string;
   highlights: string[];
   ritual?: string;
+  price: number | null;
 }

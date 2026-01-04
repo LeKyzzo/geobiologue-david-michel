@@ -1,32 +1,62 @@
-import { readFile, writeFile } from "fs/promises";
-import path from "path";
-import { Product } from "@/types/product";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { Product } from "@/types/product";
 
-const dataPath = path.join(process.cwd(), "src", "data", "products.json");
+const productsCollection = collection(db, "products");
 
-async function ensureFile(): Promise<void> {
-  try {
-    await readFile(dataPath, "utf-8");
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      await writeFile(dataPath, "[]", "utf-8");
-    } else {
-      throw error;
-    }
-  }
+function mapProduct(snapshot: { id: string; data: () => Record<string, unknown> }) {
+  const data = snapshot.data();
+  return {
+    id: snapshot.id,
+    name: String(data.name ?? ""),
+    description: String(data.description ?? ""),
+    image: String(data.image ?? ""),
+    highlights: Array.isArray(data.highlights) ? (data.highlights as string[]) : [],
+    ritual: data.ritual ? String(data.ritual) : undefined,
+    price: typeof data.price === "number" ? data.price : null,
+  } satisfies Product;
 }
 
-export async function getProducts(): Promise<Product[]> {
-  await ensureFile();
-  const data = await readFile(dataPath, "utf-8");
-  return JSON.parse(data) as Product[];
+export async function fetchProducts(): Promise<Product[]> {
+  const snapshot = await getDocs(query(productsCollection, orderBy("createdAt", "desc")));
+  return snapshot.docs.map(mapProduct);
 }
 
-export async function saveProducts(products: Product[]): Promise<void> {
-  await writeFile(dataPath, JSON.stringify(products, null, 2), "utf-8");
+export function subscribeToProducts(callback: (products: Product[]) => void) {
+  const q = query(productsCollection, orderBy("createdAt", "desc"));
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.docs.map(mapProduct));
+  });
 }
 
-export async function getProduct(productId: string): Promise<Product | undefined> {
-  const products = await getProducts();
-  return products.find((product) => product.id === productId);
+export async function createProductDocument(data: Omit<Product, "id">) {
+  const docRef = await addDoc(productsCollection, {
+    ...data,
+    price: typeof data.price === "number" ? data.price : null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateProductDocument(id: string, data: Partial<Product>) {
+  await updateDoc(doc(productsCollection, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteProductDocument(id: string) {
+  await deleteDoc(doc(productsCollection, id));
 }

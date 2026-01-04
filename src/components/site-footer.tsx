@@ -105,6 +105,9 @@ export function SiteFooter() {
             <a href="/contact" className="hover:text-white">
               Contact
             </a>
+            <a href="/admin/connexion" className="hover:text-white">
+              Connexion admin
+            </a>
           </div>
         </div>
       </div>

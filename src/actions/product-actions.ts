@@ -1,10 +1,16 @@
 'use server';
 
-import { mkdir, unlink, writeFile } from 'fs/promises';
-import path from 'path';
+import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getProducts, saveProducts } from '@/lib/products';
+import {
+  getProducts,
+  getProduct,
+  createProduct,
+  updateProduct as updateProductRecord,
+  deleteProduct as deleteProductRecord,
+} from '@/lib/products';
+import { uploadFormFileToStorage, deleteFromStorage } from '@/lib/storage';
 import { Product } from '@/types/product';
 import { requireAdminAccess } from '@/lib/auth';
 
@@ -15,8 +21,6 @@ function parseHighlights(raw: FormDataEntryValue | null): string[] {
     .map((line) => line.trim())
     .filter(Boolean) ?? [];
 }
-
-const productsImageDir = path.join(process.cwd(), 'public', 'produits');
 
 function slugify(value: string): string {
   return (
@@ -37,34 +41,8 @@ function getImageFile(formData: FormData, field: string): File | null {
   return null;
 }
 
-async function persistProductImage(file: File, baseName: string): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  const extension = path.extname(file.name) || '.png';
-  const fileName = `${slugify(baseName)}-${crypto.randomUUID()}${extension}`;
-  await mkdir(productsImageDir, { recursive: true });
-  await writeFile(path.join(productsImageDir, fileName), buffer);
-  return `/produits/${fileName}`;
-}
-
-async function deleteImageIfLocal(imagePath?: string): Promise<void> {
-  if (!imagePath || !imagePath.startsWith('/produits/')) {
-    return;
-  }
-
-  const relativePath = imagePath.replace(/^[/\\]+/, '');
-  const absolutePath = path.join(process.cwd(), 'public', relativePath);
-
-  try {
-    await unlink(absolutePath);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.error('Impossible de supprimer le fichier image', error);
-    }
-  }
-}
-
 export async function addProduct(formData: FormData) {
+  await requireAdminAccess();
   const name = formData.get('name')?.toString().trim();
   const description = formData.get('description')?.toString().trim();
   const imageFile = getImageFile(formData, 'imageFile');
@@ -75,85 +53,81 @@ export async function addProduct(formData: FormData) {
     throw new Error('Paramètres manquants pour la création');
   }
 
-  const imagePath = await persistProductImage(imageFile, name);
+  const upload = await uploadFormFileToStorage(imageFile, {
+    folder: 'products',
+    baseName: slugify(name),
+  });
 
-  const products = await getProducts();
   const newProduct: Product = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name,
     description,
-    image: imagePath,
+    image: upload.url,
+    imagePath: upload.storagePath,
     highlights,
     ritual,
   };
 
-  await saveProducts([newProduct, ...products]);
+  const createdProduct = await createProduct(newProduct);
   revalidatePath('/produits');
   revalidatePath('/admin');
-  return newProduct;
+  return createdProduct;
 }
 
 export async function updateProduct(formData: FormData) {
+  await requireAdminAccess();
   const id = formData.get('id')?.toString();
   if (!id) {
     throw new Error('Identifiant manquant');
   }
 
-  const products = await getProducts();
-  const index = products.findIndex((product) => product.id === id);
-
-  if (index === -1) {
+  const existing = await getProduct(id);
+  if (!existing) {
     throw new Error('Produit introuvable');
   }
 
   const uploadedImage = getImageFile(formData, 'imageFile');
-  const fallbackImage =
-    formData.get('currentImage')?.toString().trim() ?? products[index].image;
+  let image = existing.image;
+  let imagePath = existing.imagePath;
 
-  let imagePath = fallbackImage;
   if (uploadedImage) {
-    imagePath = await persistProductImage(
-      uploadedImage,
-      formData.get('name')?.toString().trim() || products[index].name,
-    );
-    await deleteImageIfLocal(products[index].image);
+    const upload = await uploadFormFileToStorage(uploadedImage, {
+      folder: 'products',
+      baseName: slugify(formData.get('name')?.toString().trim() || existing.name),
+    });
+    image = upload.url;
+    imagePath = upload.storagePath;
+    await deleteFromStorage(existing.imagePath);
   }
 
-  products[index] = {
-    ...products[index],
-    name: formData.get('name')?.toString().trim() ?? products[index].name,
-    description:
-      formData.get('description')?.toString().trim() ?? products[index].description,
-    image: imagePath,
-    highlights: (() => {
-      const parsed = parseHighlights(formData.get('highlights'));
-      return parsed.length ? parsed : products[index].highlights;
-    })(),
-    ritual: formData.get('ritual')?.toString().trim() || products[index].ritual,
-  };
+  const highlightsInput = parseHighlights(formData.get('highlights'));
+  const updatedProduct = await updateProductRecord(id, {
+    name: formData.get('name')?.toString().trim() || existing.name,
+    description: formData.get('description')?.toString().trim() || existing.description,
+    image,
+    imagePath,
+    highlights: highlightsInput.length ? highlightsInput : existing.highlights,
+    ritual: formData.get('ritual')?.toString().trim() || existing.ritual,
+  });
 
-  const updatedProduct = products[index];
-  await saveProducts(products);
   revalidatePath('/produits');
   revalidatePath('/admin');
   return updatedProduct;
 }
 
 export async function deleteProduct(formData: FormData) {
+  await requireAdminAccess();
   const id = formData.get('id')?.toString();
   if (!id) {
     throw new Error('Identifiant manquant');
   }
 
-  const products = await getProducts();
-  const productToDelete = products.find((product) => product.id === id);
-  if (!productToDelete) {
+  const deletedProduct = await deleteProductRecord(id);
+  if (!deletedProduct) {
     throw new Error('Produit introuvable');
   }
 
-  await deleteImageIfLocal(productToDelete.image);
-  const filtered = products.filter((product) => product.id !== id);
-  await saveProducts(filtered);
+  await deleteFromStorage(deletedProduct.imagePath);
   revalidatePath('/produits');
   revalidatePath('/admin');
   return id;
@@ -162,8 +136,13 @@ export async function deleteProduct(formData: FormData) {
 export async function resetProducts() {
   await requireAdminAccess();
   const products = await getProducts();
-  await Promise.all(products.map((product) => deleteImageIfLocal(product.image)));
-  await saveProducts([]);
+  await Promise.all(
+    products.map(async (product) => {
+      await deleteFromStorage(product.imagePath);
+      await deleteProductRecord(product.id);
+    }),
+  );
   revalidatePath('/produits');
   redirect('/admin');
 }
+
